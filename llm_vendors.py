@@ -1,5 +1,6 @@
 import os
 
+from colorama import Fore
 from dotenv import load_dotenv
 from google import genai
 from langchain_core.outputs import LLMResult
@@ -57,6 +58,6 @@ def ask_ollama(context: str, prompt: str, model: str = "llama3.2", step: str = N
         total_duration_ns = info.get('total_duration')
         duration_s = f"{(total_duration_ns / 1_000_000_000):.2f}s" if total_duration_ns else "N/A"
         print(
-            f"{s_i} Stats | Model: {model_name}, Prompt Tokens: {prompt_tokens}, Response Tokens: {response_tokens}, Duration: {duration_s}")
+            f"{Fore.YELLOW + s_i} Stats | Model: {model_name}, Prompt Tokens: {prompt_tokens}, Response Tokens: {response_tokens}, Duration: {duration_s}")
 
     return response_text

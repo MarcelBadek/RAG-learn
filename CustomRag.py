@@ -1,12 +1,13 @@
 import os
 import re
 
+from colorama import Fore
 from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pypdf import PdfReader
 
-from utils.log_utils import s_i, s_l
+from utils.log_utils import s_i, s_l, s_s
 from utils.utils import load_files
 from llm_vendors import ask_ollama
 
@@ -94,11 +95,16 @@ class CustomRag:
             chunks.extend(page_chunks)
         return chunks
 
+    def clear_vectorstore(self):
+        print(f"{s_l} Clearing vector store...")
+        self.vectorstore.delete_collection()
+        print(f"{s_s} Vector store cleared.")
+
     def ask(self, question):
         documents = self._find_relevant_documents(question)
         print(f"{s_i} Founded documents:")
         for doc in documents:
-            print(f"{" " * 6} - {doc.replace("\n", " ")}")
+            print(f"{Fore.CYAN + " " * 6} - {doc.replace("\n", " ")}")
         print(f"{s_l} Preparing context for LLM...")
         conceited_documents = "\n\n".join(documents)
         print(f"{s_l} Generating answer with LLM...")

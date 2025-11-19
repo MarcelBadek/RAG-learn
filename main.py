@@ -1,7 +1,11 @@
+import time
+from colorama import Fore, init
+
 from CustomRag import CustomRag, s_i
 from utils.log_utils import s_q, s_a
 
 if __name__ == "__main__":
+    init(autoreset=True)
     rag = CustomRag()
 
     # rag.load_universe_files()
@@ -14,5 +18,9 @@ if __name__ == "__main__":
             print("Goodbye!")
             break
 
+        start_time = time.time()
         answer = rag.ask(user_input)
-        print(f"{s_a} RAG: {answer}")
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        print(f"{Fore.YELLOW + s_i} Execution time: {elapsed_time:.2f} seconds")
+        print(f"{s_a} RAG:\n{Fore.MAGENTA + answer}")
