@@ -1,6 +1,7 @@
 import re
 
 from colorama import Fore
+from langchain_experimental.text_splitter import SemanticChunker
 from langchain_milvus import Milvus
 from langchain_ollama import OllamaEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -47,20 +48,26 @@ class CustomRag:
             strip_whitespace=True
         )
 
-    def load_text_files(self, path="documents/universe", doc_type="universe"):
+        self.semantic_chunker = SemanticChunker(
+            embeddings=embedding_model,
+        )
+
+    def load_text_files(self, path="documents/universe", doc_type="universe", use_semantic=False):
+        extractor = self._extract_text_from_txt_semantic if use_semantic else self._extract_text_from_txt
         self._load_documents(
             path=path,
             file_type="txt",
             doc_type=doc_type,
-            extractor=self._extract_text_from_txt
+            extractor=extractor
         )
 
-    def load_pdf_files(self,  path="documents/rfc", doc_type="RFC"):
+    def load_pdf_files(self,  path="documents/rfc", doc_type="RFC", use_semantic=False):
+        extractor = self._extract_text_from_pdf_semantic if use_semantic else self._extract_text_from_pdf
         self._load_documents(
             path=path,
             file_type="pdf",
             doc_type=doc_type,
-            extractor=self._extract_text_from_pdf
+            extractor=extractor
         )
 
     def _load_documents(self, path, file_type, doc_type, extractor):
@@ -84,6 +91,13 @@ class CustomRag:
             metadatas=[{"source": file.name}]
         )
 
+    def _extract_text_from_txt_semantic(self, file):
+        text = file.read_text(encoding="utf-8")
+        return self.semantic_chunker.create_documents(
+            [text],
+            metadatas=[{"source": file.name}]
+        )
+
     def _extract_text_from_pdf(self, file):
         chunks = []
         pdf_reader = PdfReader(file)
@@ -97,9 +111,23 @@ class CustomRag:
             chunks.extend(page_chunks)
         return chunks
 
+    def _extract_text_from_pdf_semantic(self, file):
+        pdf_reader = PdfReader(file)
+
+        full_text = ""
+        for page_num, page in enumerate(pdf_reader.pages, start=1):
+            text = page.extract_text()
+            text = re.sub(r'\n+', '\n', text)
+            full_text += text + "\n"
+
+        return self.semantic_chunker.create_documents(
+            [full_text],
+            metadatas=[{"source": file.name}]
+        )
+
     def clear_vectorstore(self):
         print(f"{s_l} Clearing vector store...")
-        self.vectorstore.col.drop()
+        self.vectorstore.delete(expr="True")
         print(f"{s_s} Vector store cleared.")
 
     def ask(self, question):

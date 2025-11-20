@@ -8,8 +8,9 @@ if __name__ == "__main__":
     init(autoreset=True)
     rag = CustomRag()
 
+    rag.clear_vectorstore()
     # rag.load_text_files()
-    rag.load_pdf_files()
+    rag.load_pdf_files(use_semantic=True)
 
     print(f"{s_i} Hello! How can I assist you today?")
     while True:
