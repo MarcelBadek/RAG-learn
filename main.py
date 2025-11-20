@@ -8,8 +8,8 @@ if __name__ == "__main__":
     init(autoreset=True)
     rag = CustomRag()
 
-    # rag.load_universe_files()
-    rag.load_rfc_files()
+    # rag.load_text_files()
+    rag.load_pdf_files()
 
     print(f"{s_i} Hello! How can I assist you today?")
     while True:

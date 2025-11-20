@@ -1,63 +1,65 @@
-import os
 import re
 
 from colorama import Fore
-from langchain_chroma import Chroma
+from langchain_milvus import Milvus
 from langchain_ollama import OllamaEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pypdf import PdfReader
 
+from llm_vendors import ask_ollama
 from utils.log_utils import s_i, s_l, s_s
 from utils.utils import load_files
-from llm_vendors import ask_ollama
-
 
 DEFAULT_MODEL = "llama3.1"
 DEFAULT_EMBEDDING_MODEL = "embeddinggemma"
 DEFAULT_BASE_URL = "localhost:11434"
+DEFAULT_COLLECTION_NAME = "rag_collection"
+DEFAULT_MILVUS_URI = "http://localhost:19530"
 
 
 class CustomRag:
     def __init__(self,
                  embedding_model=OllamaEmbeddings(model=DEFAULT_EMBEDDING_MODEL, base_url=DEFAULT_BASE_URL),
-                 split_chunk_size=500,
-                 split_chunk_overlap=100,
-                 persist_directory="./chroma_db"):
-        if not os.path.exists(persist_directory):
-            os.makedirs(persist_directory)
+                 split_chunk_size=1000,
+                 split_chunk_overlap=200,
+                 collection_name=DEFAULT_COLLECTION_NAME,
+                 connection_uri=DEFAULT_MILVUS_URI):
 
-        self.vectorstore = Chroma(
-            collection_name="my_collection",
+        self.vectorstore = Milvus(
             embedding_function=embedding_model,
-            persist_directory=persist_directory,
-            collection_metadata={"hnsw:space": "cosine"}
+            collection_name=collection_name,
+            connection_args={"uri": connection_uri},
+            auto_id=True,
+            drop_old=False
         )
+
         self.retriever = self.vectorstore.as_retriever(
             search_kwargs={
                 "k": 10,
             }
         )
+
         self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=split_chunk_size,
             chunk_overlap=split_chunk_overlap,
-            separators=["\n\n", "\n", ". ", " ", ""],
+            separators=["\n\n", "\n", ". "],
             keep_separator=True,
             strip_whitespace=True
         )
 
-    def load_universe_files(self, path="documents/universe"):
+    def load_text_files(self, path="documents/universe", doc_type="universe"):
         self._load_documents(
             path=path,
             file_type="txt",
-            doc_type="universe",
+            doc_type=doc_type,
             extractor=self._extract_text_from_txt
         )
 
-    def load_rfc_files(self,  path="documents/rfc"):
+    def load_pdf_files(self,  path="documents/rfc", doc_type="RFC"):
         self._load_documents(
             path=path,
             file_type="pdf",
-            doc_type="RFC",
+            doc_type=doc_type,
             extractor=self._extract_text_from_pdf
         )
 
@@ -97,7 +99,7 @@ class CustomRag:
 
     def clear_vectorstore(self):
         print(f"{s_l} Clearing vector store...")
-        self.vectorstore.delete_collection()
+        self.vectorstore.col.drop()
         print(f"{s_s} Vector store cleared.")
 
     def ask(self, question):
