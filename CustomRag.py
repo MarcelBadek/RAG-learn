@@ -12,7 +12,8 @@ from utils.log_utils import s_i, s_l, s_s
 from utils.utils import load_files
 
 DEFAULT_MODEL = "llama3.1"
-DEFAULT_EMBEDDING_MODEL = "embeddinggemma"
+# DEFAULT_EMBEDDING_MODEL = "embeddinggemma"
+DEFAULT_EMBEDDING_MODEL = "qwen3-embedding"
 DEFAULT_BASE_URL = "localhost:11434"
 DEFAULT_COLLECTION_NAME = "rag_collection"
 DEFAULT_MILVUS_URI = "http://localhost:19530"
@@ -50,6 +51,8 @@ class CustomRag:
 
         self.semantic_chunker = SemanticChunker(
             embeddings=embedding_model,
+            breakpoint_threshold_type="percentile",
+            breakpoint_threshold_amount=85,
         )
 
     def load_text_files(self, path="documents/universe", doc_type="universe", use_semantic=False):
@@ -61,7 +64,7 @@ class CustomRag:
             extractor=extractor
         )
 
-    def load_pdf_files(self,  path="documents/rfc", doc_type="RFC", use_semantic=False):
+    def load_pdf_files(self, path="documents/rfc", doc_type="RFC", use_semantic=False):
         extractor = self._extract_text_from_pdf_semantic if use_semantic else self._extract_text_from_pdf
         self._load_documents(
             path=path,
@@ -77,6 +80,7 @@ class CustomRag:
 
         all_chunks = []
         for file in files:
+            print(f"{s_l} Processing file: {file.name}...")
             chunks = extractor(file)
             all_chunks.extend(chunks)
 
@@ -127,7 +131,7 @@ class CustomRag:
 
     def clear_vectorstore(self):
         print(f"{s_l} Clearing vector store...")
-        self.vectorstore.delete(expr="True")
+        self.vectorstore.drop()
         print(f"{s_s} Vector store cleared.")
 
     def ask(self, question):
