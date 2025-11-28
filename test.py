@@ -1,10 +1,12 @@
 from colorama import init
 
+from CustomLogger import log, LoggerCategory, CustomLogger
 from CustomRag import CustomRag, DEFAULT_MODEL
 from TestRunner import TestRunner
-from utils.utils import load_test_set
+from utils import load_test_set
 
 if __name__ == "__main__":
+    CustomLogger.configure([LoggerCategory.ERROR, LoggerCategory.PROCESSING_QUESTION])
     init(autoreset=True)
     rag = CustomRag()
     # rag.clear_vectorstore()
@@ -17,8 +19,8 @@ if __name__ == "__main__":
         question = details.get("question", "")
         expected_answer = details.get("expected_answer", "")
         keywords = details.get("keywords", [])
-        print(f"[{index + 1}] Question: {question}, Expected Answer: {expected_answer}, Keywords: {keywords}")
+        log.processing_question(
+            f"Question {index + 1}: {question}, Expected Answer: {expected_answer}, Keywords: {keywords}")
         test_runner.run_test(question, expected_answer, keywords)
 
     test_runner.save_tests_results(file_name)
-

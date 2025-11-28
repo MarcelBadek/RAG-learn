@@ -2,7 +2,7 @@ from colorama import Fore
 from langchain_core.outputs import LLMResult
 from langchain_ollama import OllamaLLM
 
-from utils.log_utils import s_i
+from CustomLogger import log
 
 ASK_INTRO = "You are an AI language model developed to provide accurate and concise answers based on the provided context. Always refer to the context when formulating your responses. If the context does not contain sufficient information to answer the question, respond with 'I don't know'. Avoid fabricating information."
 
@@ -15,9 +15,8 @@ VALIDATION_TEMPLATE = "{intro} \n{validation_context} \nAnswer: {answer} \nYour 
 
 
 class AdjustedOllama:
-    def __init__(self, model, debug_print=False):
+    def __init__(self, model):
         self.llm = OllamaLLM(model=model)
-        self.print_details = debug_print
 
     def ask_ollama(self, context: str, prompt: str):
         contents = ASK_TEMPLATE.format(
@@ -37,8 +36,7 @@ class AdjustedOllama:
                 'total_duration_s': f"{(info.get('total_duration') / 1_000_000_000):.2f}" if info.get(
                     'total_duration') else "N/A"
             }
-            print(
-                f"{Fore.YELLOW + s_i} Stats | Model: {details['model']}, Prompt Tokens: {details['prompt_eval_count']}, Response Tokens: {details['eval_count']}, Duration: {details['total_duration_s']}s")
+            log.statistics(f"Model: {details['model']}, Prompt Tokens: {details['prompt_eval_count']}, Response Tokens: {details['eval_count']}, Duration: {details['total_duration_s']}s")
 
         return response_text, details
 
@@ -73,12 +71,9 @@ class AdjustedOllama:
         return self._interpret_validation_response(response_text)
 
     def send_prompt_to_ollama(self, prompt: str):
-        # print(Fore.RED + prompt)
+        log.full_prompt(prompt)
         result: LLMResult = self.llm.generate([prompt])
         response_text = result.generations[0][0].text.strip()
-
-        if self.print_details:
-            print(Fore.RED + s_i + response_text)
 
         return response_text, result
 

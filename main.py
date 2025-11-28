@@ -1,8 +1,8 @@
 import time
-from colorama import Fore, init
+from colorama import init
 
-from CustomRag import CustomRag, s_i
-from utils.log_utils import s_q, s_a
+from CustomLogger import log
+from CustomRag import CustomRag
 
 if __name__ == "__main__":
     init(autoreset=True)
@@ -12,16 +12,16 @@ if __name__ == "__main__":
     # rag.load_text_files()
     # rag.load_pdf_files(use_semantic=True)
 
-    print(f"{s_i} Hello! How can I assist you today?")
+    log.answer(f"Hello! How can I assist you today?")
     while True:
-        user_input = input(f"{s_q} Question: ")
+        user_input = input(f"Question: ")
         if user_input.lower() in {"exit", "quit"}:
-            print("Goodbye!")
+            log.answer("Goodbye!")
             break
 
         start_time = time.time()
         answer, _, _ = rag.ask(user_input)
         end_time = time.time()
         elapsed_time = end_time - start_time
-        print(f"{Fore.YELLOW + s_i} Execution time: {elapsed_time:.2f} seconds")
-        print(f"{s_a} RAG:\n{Fore.MAGENTA + answer}")
+        log.statistics(f"Execution time: {elapsed_time:.2f} seconds")
+        log.answer(answer)

@@ -1,3 +1,4 @@
+import logging
 import re
 
 from colorama import Fore
@@ -8,8 +9,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pypdf import PdfReader
 
 from AdjustedOllama import AdjustedOllama
-from utils.log_utils import s_i, s_l, s_s
-from utils.utils import load_files
+from CustomLogger import log
+from utils import load_files
 
 DEFAULT_MODEL = "llama3.1"
 DEFAULT_EMBEDDING_MODEL = "embeddinggemma"
@@ -76,18 +77,18 @@ class CustomRag:
         )
 
     def _load_documents(self, path, file_type, doc_type, extractor):
-        print(f"{s_l} Loading {doc_type} documents...")
+        log.loading(f"Loading {doc_type} documents")
         files = load_files(path, file_type)
-        print(f"{s_i} Found {len(files)} files in the documents directory")
+        log.info(f"Found {len(files)} files in the documents directory")
 
         all_chunks = []
         for file in files:
-            print(f"{s_l} Processing file: {file.name}...")
+            log.loading("Processing file: {file.name}")
             chunks = extractor(file)
             all_chunks.extend(chunks)
 
-        print(f"{s_i} Created {len(all_chunks)} text chunks")
-        print(f"{s_l} Adding documents to vector store...")
+        log.info(f"Created {len(all_chunks)} text chunks")
+        log.loading(f"Adding documents to vector store")
         self.vectorstore.add_documents(all_chunks)
 
     def _extract_text_from_txt(self, file):
@@ -132,23 +133,24 @@ class CustomRag:
         )
 
     def clear_vectorstore(self):
-        print(f"{s_l} Clearing vector store...")
+        log.loading(f"Clearing vector store")
         self.vectorstore.drop()
-        print(f"{s_s} Vector store cleared.")
+        log.info(f"Vector store cleared")
 
     def ask(self, question):
         documents = self._find_relevant_documents(question)
-        print(f"{s_i} Found documents:")
+        log.documents("Found documents:")
         for doc in documents:
-            print(f"{Fore.CYAN + " " * 6} - {doc.replace("\n", " ")}")
-        print(f"{s_l} Preparing context for LLM...")
+            log.documents(f"{" " * 6} - {doc.replace("\n", " ")}")
+            logging.info(f"{Fore.CYAN + " " * 6} - {doc.replace("\n", " ")}")
+        log.loading(f"Preparing context for LLM")
         concatenated_documents = "\n\n".join(documents)
-        print(f"{s_l} Generating answer with LLM...")
+        log.loading(f"Generating answer with LLM")
         answer, details = self.adjusted_model.ask_ollama(concatenated_documents, question)
         return answer, documents, details
 
     def _find_relevant_documents(self, question):
-        print(f"{s_l} Retrieving documents for query: '{question}'...")
+        log.loading(f"Retrieving documents for query: '{question}'")
         documents = self.retriever.invoke(question)
-        print(f"{s_i} Retrieved {len(documents)} relevant documents")
+        log.info(f"Retrieved {len(documents)} relevant documents for the query")
         return [doc.page_content for doc in documents]
