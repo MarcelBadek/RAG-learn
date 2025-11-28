@@ -16,11 +16,8 @@ if __name__ == "__main__":
     questions = load_test_set(f"tests/questions/{file_name}.json")
 
     for index, details in enumerate(questions):
-        question = details.get("question", "")
-        expected_answer = details.get("expected_answer", "")
-        keywords = details.get("keywords", [])
-        log.processing_question(
-            f"Question {index + 1}: {question}, Expected Answer: {expected_answer}, Keywords: {keywords}")
-        test_runner.run_test(question, expected_answer, keywords)
+        test_runner.run_test(details)
 
     test_runner.save_tests_results(file_name)
+
+    # test_runner.multirun_tests(questions, 100)

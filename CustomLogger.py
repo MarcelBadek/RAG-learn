@@ -95,6 +95,6 @@ class CustomLogger:
 
     def processing_question(self, message: str):
         if LoggerCategory.PROCESSING_QUESTION in self.categories:
-            print(f"{Fore.LIGHTWHITE_EX}[p] {message}{Style.RESET_ALL}")
+            print(f"{Fore.LIGHTBLUE_EX}[p] {message}{Style.RESET_ALL}")
 
 log = CustomLogger()

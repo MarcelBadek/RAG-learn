@@ -1,3 +1,4 @@
+import datetime
 import json
 from pathlib import Path
 
@@ -15,3 +16,6 @@ def load_test_set(test_file_path):
 def save_json(data, file_path):
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
+
+def get_current_datetime():
+    return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
