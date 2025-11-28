@@ -7,13 +7,13 @@ from langchain_ollama import OllamaEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pypdf import PdfReader
 
-from llm_vendors import ask_ollama
+from AdjustedOllama import AdjustedOllama
 from utils.log_utils import s_i, s_l, s_s
 from utils.utils import load_files
 
 DEFAULT_MODEL = "llama3.1"
-# DEFAULT_EMBEDDING_MODEL = "embeddinggemma"
-DEFAULT_EMBEDDING_MODEL = "qwen3-embedding"
+DEFAULT_EMBEDDING_MODEL = "embeddinggemma"
+# DEFAULT_EMBEDDING_MODEL = "qwen3-embedding"
 DEFAULT_BASE_URL = "localhost:11434"
 DEFAULT_COLLECTION_NAME = "rag_collection"
 DEFAULT_MILVUS_URI = "http://localhost:19530"
@@ -54,6 +54,8 @@ class CustomRag:
             breakpoint_threshold_type="percentile",
             breakpoint_threshold_amount=85,
         )
+
+        self.adjusted_model = AdjustedOllama(DEFAULT_MODEL)
 
     def load_text_files(self, path="documents/universe", doc_type="universe", use_semantic=False):
         extractor = self._extract_text_from_txt_semantic if use_semantic else self._extract_text_from_txt
@@ -136,14 +138,14 @@ class CustomRag:
 
     def ask(self, question):
         documents = self._find_relevant_documents(question)
-        print(f"{s_i} Founded documents:")
+        print(f"{s_i} Found documents:")
         for doc in documents:
             print(f"{Fore.CYAN + " " * 6} - {doc.replace("\n", " ")}")
         print(f"{s_l} Preparing context for LLM...")
-        conceited_documents = "\n\n".join(documents)
+        concatenated_documents = "\n\n".join(documents)
         print(f"{s_l} Generating answer with LLM...")
-        answer = ask_ollama(conceited_documents, question, model=DEFAULT_MODEL)
-        return answer
+        answer, details = self.adjusted_model.ask_ollama(concatenated_documents, question)
+        return answer, documents, details
 
     def _find_relevant_documents(self, question):
         print(f"{s_l} Retrieving documents for query: '{question}'...")

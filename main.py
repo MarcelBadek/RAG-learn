@@ -8,9 +8,9 @@ if __name__ == "__main__":
     init(autoreset=True)
     rag = CustomRag()
 
-    rag.clear_vectorstore()
+    # rag.clear_vectorstore()
     # rag.load_text_files()
-    rag.load_pdf_files(use_semantic=True)
+    # rag.load_pdf_files(use_semantic=True)
 
     print(f"{s_i} Hello! How can I assist you today?")
     while True:
@@ -20,7 +20,7 @@ if __name__ == "__main__":
             break
 
         start_time = time.time()
-        answer = rag.ask(user_input)
+        answer, _, _ = rag.ask(user_input)
         end_time = time.time()
         elapsed_time = end_time - start_time
         print(f"{Fore.YELLOW + s_i} Execution time: {elapsed_time:.2f} seconds")

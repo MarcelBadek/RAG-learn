@@ -218,4 +218,4 @@ __marimo__/
 vectorstore/
 documents/rfc/
 volumes/
-tests_results/
+tests/results
