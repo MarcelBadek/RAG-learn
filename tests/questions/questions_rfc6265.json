@@ -1,215 +1,213 @@
 [
   {
     "question": "What is the main purpose of RFC6265?",
-    "expected_answer": "RFC6265 defines the HTTP Cookie and Set-Cookie header fields. It specifies how servers store state on user agents using cookies, and how user agents return this state in Cookie headers, providing a standardized HTTP state management mechanism while maximizing interoperability.",
+    "expected_answer": "RFC6265 defines the HTTP Cookie and Set-Cookie header fields to allow servers to store state on user agents, maintaining a stateful session over the stateless HTTP protocol.",
     "keywords": [
-      "defines Cookie and Set-Cookie",
-      "HTTP state management",
+      "HTTP Cookie",
+      "Set-Cookie header",
       "store state",
-      "interoperability",
-      "standardizes cookies"
+      "stateful session",
+      "HTTP protocol"
     ]
   },
   {
     "question": "How does the Set-Cookie header work?",
-    "expected_answer": "A server sends a Set-Cookie header in an HTTP response containing a cookie name-value pair and optional attributes. When the user agent receives it, it stores the cookie and later includes it in Cookie headers for requests that fall within the cookie’s scope (domain, path, expiry, etc.). If a cookie with the same name, domain, and path already exists, it is replaced.",
+    "expected_answer": "The server sends a Set-Cookie header in a response. The user agent stores the cookie. If a cookie with the same name, domain, and path already exists, the user agent evicts the old cookie and replaces it with the new one.",
     "keywords": [
+      "response header",
       "server sends Set-Cookie",
-      "stores cookie",
-      "cookie attributes",
-      "later returned via Cookie header",
+      "user agent stores",
       "replace existing cookie"
     ]
   },
   {
     "question": "What are the security considerations for cookies mentioned in RFC6265?",
-    "expected_answer": "RFC6265 describes several security issues: ambient authority (risk of CSRF), clear-text transmission without secure channels, session fixation vulnerabilities, weak confidentiality (no isolation by port, scheme, or path), weak integrity (sibling domains can overwrite cookies), and reliance on DNS security. Secure and HttpOnly mitigate some but not all concerns.",
+    "expected_answer": "RFC6265 identifies several security considerations: ambient authority (CSRF), clear-text transmission, session fixation, weak confidentiality (lack of isolation by port or scheme), weak integrity (sibling domains overwriting cookies), and reliance on DNS.",
     "keywords": [
       "ambient authority",
       "clear text",
       "session fixation",
       "weak confidentiality",
       "weak integrity",
-      "DNS reliance",
-      "security pitfalls"
+      "reliance on DNS"
     ]
   },
   {
     "question": "What is the difference between session cookies and persistent cookies?",
-    "expected_answer": "A session cookie has no Expires or Max-Age attribute and lasts until 'the current session is over' as defined by the user agent. A persistent cookie includes Expires or Max-Age attributes and is retained until the specified expiry time, unless the user agent evicts it earlier.",
+    "expected_answer": "A session cookie lacks the Expires or Max-Age attributes and is retained only until the current session is over. A persistent cookie includes an Expires or Max-Age attribute and is retained until the specified expiration, or until the user agent evicts it.",
     "keywords": [
       "session cookie",
       "persistent cookie",
       "Expires",
       "Max-Age",
-      "session ends"
+      "current session is over"
     ]
   },
   {
     "question": "How does the Domain attribute affect cookie scope?",
-    "expected_answer": "The Domain attribute specifies which hosts will receive the cookie. If present, the cookie is sent to the specified domain and its subdomains. Without it, the cookie is host-only and sent only to the origin server. The user agent rejects Domain values not matching or suffix-matching the request-host.",
+    "expected_answer": "If the Domain attribute is present, the cookie is sent to that domain/hosts and its subdomains. If the Domain attribute is absent, the user agent will return the cookie only to the origin server.",
     "keywords": [
       "Domain attribute",
+      "domain",
+      "hosts",
       "subdomains",
-      "host-only cookie",
-      "domain-match",
-      "scope"
-    ]
-  },
-  {
-    "question": "What is the purpose of the Path attribute in cookies?",
-    "expected_answer": "The Path attribute restricts the cookie to requests whose request-uri path matches the cookie’s path using the path-match algorithm. If omitted, a default-path is derived from the request-uri. Path can isolate cookies across different paths but should not be relied on for security.",
-    "keywords": [
-      "Path attribute",
-      "path-match",
-      "default-path",
-      "scope limitation",
-      "not for security"
-    ]
-  },
-  {
-    "question": "What does the Secure attribute do?",
-    "expected_answer": "The Secure attribute instructs the user agent to include the cookie only in requests transmitted over secure channels such as HTTPS. It protects confidentiality but not integrity, because an attacker can still overwrite Secure cookies from insecure channels.",
-    "keywords": [
-      "Secure attribute",
-      "HTTPS",
-      "secure channel",
-      "confidentiality",
-      "not integrity"
-    ]
-  },
-  {
-    "question": "How does the HttpOnly flag enhance cookie security?",
-    "expected_answer": "The HttpOnly attribute restricts the cookie to HTTP requests and instructs the user agent to omit it from non-HTTP APIs (such as script-accessible APIs). This prevents scripts from reading the cookie and mitigates attacks such as cross-site scripting.",
-    "keywords": [
-      "HttpOnly",
-      "non-HTTP APIs",
-      "script access blocked",
-      "XSS mitigation"
-    ]
-  },
-  {
-    "question": "What are the restrictions on cookie size and number?",
-    "expected_answer": "User agents should support at least 4096 bytes per cookie, at least 50 cookies per domain, and at least 3000 cookies total. User agents may evict cookies at any time and must remove expired ones.",
-    "keywords": [
-      "4096 bytes",
-      "50 cookies per domain",
-      "3000 cookies total",
-      "limits",
-      "eviction"
-    ]
-  },
-  {
-    "question": "How should user agents handle invalid cookies?",
-    "expected_answer": "User agents may ignore a received cookie entirely. They must ignore cookie-av attributes that fail validation (e.g., invalid Expires or Max-Age). They must reject Domain attributes not matching the origin or corresponding to public suffixes (if configured).",
-    "keywords": [
-      "ignore invalid cookie",
-      "ignore invalid attributes",
-      "Domain rejection",
-      "public suffix"
-    ]
-  },
-  {
-    "question": "What is the SameSite attribute and why was it introduced?",
-    "expected_answer": "RFC6265 does NOT define or mention a SameSite attribute. It is not part of this specification.",
-    "keywords": [
-      "SameSite not in RFC6265",
-      "not defined",
-      "absent"
-    ]
-  },
-  {
-    "question": "How does cookie expiration work with the Expires and Max-Age attributes?",
-    "expected_answer": "Expires provides an absolute date and time when the cookie expires. Max-Age specifies the lifetime in seconds from the current time. If both are present, Max-Age takes precedence. If neither is present, the cookie is a session cookie.",
-    "keywords": [
-      "Expires",
-      "Max-Age",
-      "absolute time",
-      "relative time",
-      "precedence"
-    ]
-  },
-  {
-    "question": "What are the privacy concerns related to third-party cookies?",
-    "expected_answer": "Third-party cookies allow third-party servers to track users across sites. User agents may restrict sending or setting such cookies. Third-party tracking can occur even without cookies via other mechanisms.",
-    "keywords": [
-      "third-party cookies",
-      "tracking",
-      "privacy",
-      "user agent restrictions"
-    ]
-  },
-  {
-    "question": "How should servers set cookies to prevent CSRF attacks?",
-    "expected_answer": "RFC6265 does not define a specific CSRF mitigation mechanism. It states that cookies create ambient authority and contribute to CSRF vulnerabilities. It suggests reconsidering reliance on cookies for authorization and instead coupling designation and authorization (e.g., secrets in URLs), but does not prescribe cookie-specific CSRF protections.",
-    "keywords": [
-      "CSRF",
-      "ambient authority",
-      "no specific mitigation",
-      "authorization risks"
-    ]
-  },
-  {
-    "question": "What characters are allowed in cookie names and values?",
-    "expected_answer": "Cookie names must be tokens as defined by RFC2616. Cookie values may be sequences of cookie-octet characters or quoted strings. cookie-octet includes allowed US-ASCII ranges excluding control characters, whitespace, DQUOTE, comma, semicolon, and backslash.",
-    "keywords": [
-      "token",
-      "cookie-octet",
-      "allowed characters",
-      "RFC2616",
-      "quoted values"
+      "origin server"
     ]
   },
   {
     "question": "How do subdomains interact with cookie Domain attributes?",
-    "expected_answer": "If a cookie specifies a Domain attribute, it is sent to that domain and all its subdomains. A subdomain (e.g., foo.example.com) may set cookies for its parent domain (example.com) unless restricted by public suffix rules. Without Domain specified, the cookie is host-only and not sent to subdomains.",
+    "expected_answer": "If the Domain attribute is set, the cookie applies to that domain and all its subdomains. If the server omits the Domain attribute, the cookie is returned only to the origin server and not to any subdomains.",
     "keywords": [
-      "subdomains",
       "Domain attribute",
-      "host-only",
-      "domain-match"
+      "cookie applies",
+      "subdomains",
+      "only origin server"
+    ]
+  },
+  {
+    "question": "What is the purpose of the Path attribute in cookies?",
+    "expected_answer": "The Path attribute limits the scope of the cookie to a set of paths. The user agent includes the cookie in a request only if the request-uri path matches or is a subdirectory of the cookie's Path attribute.",
+    "keywords": [
+      "limits scope",
+      "set of paths",
+      "Path attribute",
+      "matches path",
+      "subdirectory"
+    ]
+  },
+  {
+    "question": "What does the Secure attribute do?",
+    "expected_answer": "The Secure attribute limits the scope of the cookie to secure channels. The user agent includes the cookie only in requests transmitted over a secure channel, such as HTTPS (HTTP over TLS).",
+    "keywords": [
+      "Secure attribute",
+      "secure channels",
+      "HTTPS",
+      "HTTP over TLS"
+    ]
+  },
+  {
+    "question": "How does the HttpOnly flag enhance cookie security?",
+    "expected_answer": "The HttpOnly attribute limits the scope of the cookie to HTTP requests. It instructs the user agent to omit the cookie from non-HTTP APIs, such as those exposed to scripts.",
+    "keywords": [
+      "HttpOnly",
+      "limit to HTTP",
+      "omit from non-HTTP APIs",
+      "exposes cookies",
+      "scripts"
+    ]
+  },
+  {
+    "question": "What are the restrictions on cookie size and number?",
+    "expected_answer": "User agents should provide at least 4096 bytes per cookie, at least 50 cookies per domain, and at least 3000 cookies total.",
+    "keywords": [
+      "4096 bytes",
+      "50 cookies per domain",
+      "3000 cookies total",
+      "minimum capabilities"
+    ]
+  },
+  {
+    "question": "How should user agents handle invalid cookies?",
+    "expected_answer": "User agents ignore attributes that fail to parse (but not entire cookie). They ignore entire cookies where the Domain attribute does not domain-match the request host or is a public suffix.",
+    "keywords": [
+      "ignore attributes",
+      "entire cookie",
+      "domain-match",
+      "public suffix",
+      "ignore entire cookies"
+    ]
+  },
+  {
+    "question": "What is the SameSite attribute and why was it introduced?",
+    "expected_answer": "I do not have sufficient information to answer this question.",
+    "keywords": [
+      "insufficient information",
+      "not mentioned",
+      "no information"
+    ]
+  },
+  {
+    "question": "How does cookie expiration work with the Expires and Max-Age attributes?",
+    "expected_answer": "They both indicates the maximum lifetime of the cookie. Expires is represented as the date and time of cookie expiration. Max-Age indicates a left lifetime in seconds. If both are present, Max-Age has precedence.",
+    "keywords": [
+      "Expires",
+      "Max-Age",
+      "date and time",
+      "seconds",
+      "precedence",
+      "Max-Age controls"
+    ]
+  },
+  {
+    "question": "What are the privacy concerns related to third-party cookies?",
+    "expected_answer": "User agent often requests resources from other servers. Third-party servers can track users across different sites using cookies, even if the user never directly visits the third-party site.",
+    "keywords": [
+      "third-party servers",
+      "cookies",
+      "track users",
+      "never directly visits"
+    ]
+  },
+  {
+    "question": "How should servers set cookies to prevent CSRF attacks?",
+    "expected_answer": "Ser You can entangling designation and authorization (using secrets in URLs) instead of relying on cookies. But I do not have sufficient information to provide further answer.",
+    "keywords": [
+      "entangling designation",
+      "authorization",
+      "URLs",
+      "capabilities",
+      "insufficient information"
+    ]
+  },
+  {
+    "question": "What characters are allowed in cookie names and values?",
+    "expected_answer": "Cookie names must be tokens as defined in RFC 2616. Cookie values can be sequences of cookie-octets, which are US-ASCII characters excluding control characters, whitespace, double quotes, comma, semicolon, and backslash.",
+    "keywords": [
+      "token",
+      "cookie-octets",
+      "US-ASCII",
+      "excluding control characters"
     ]
   },
   {
     "question": "What happens when multiple cookies have the same name?",
-    "expected_answer": "If a user agent receives a new cookie with the same name, domain, and path as an existing one, it replaces the old cookie. If multiple cookies with the same name but different paths or domains are stored, the Cookie header may include them all, and servers must not rely on their order.",
+    "expected_answer": "If a user agent receives a new cookie with the same name, domain, and path, it replaces the existing one. If cookies have the same name but different paths/domains, they are all sent in the Cookie header; servers should not rely on their order.",
     "keywords": [
-      "same name",
-      "replacement",
-      "domain and path",
+      "replace existing",
       "multiple cookies",
-      "order not guaranteed"
+      "Cookie header",
+      "order"
     ]
   },
   {
     "question": "How should cookies be transmitted in HTTP requests?",
-    "expected_answer": "Cookies are sent in a single Cookie header containing a cookie-string composed of applicable, non-expired cookies sorted by path length and creation time. The user agent includes only cookies whose domain, path, secure-only, and http-only rules match the request.",
+    "expected_answer": "Cookies are transmitted in the Cookie header. The user agent serializes stored cookies into a cookie-string, separating them with a semicolon and space.",
     "keywords": [
       "Cookie header",
       "cookie-string",
-      "sorting",
-      "secure-only",
-      "path-match"
+      "semicolon",
+      "whitespace"
     ]
   },
   {
     "question": "What are the recommendations for cookie deletion?",
-    "expected_answer": "Servers delete cookies by sending a Set-Cookie header with the same name, domain, and path as the original cookie, and an Expires date in the past. User agents also delete expired cookies automatically.",
+    "expected_answer": "To remove a cookie, the server sends a Set-Cookie header with an expiration date in the past. The Path and Domain attributes must match the values used when the cookie was created.",
     "keywords": [
-      "delete cookie",
-      "Expires in the past",
-      "matching domain and path",
-      "automatic expiration"
+      "expiration date in the past",
+      "Set-Cookie",
+      "match Path and Domain"
     ]
   },
   {
     "question": "How does RFC6265 differ from previous cookie specifications?",
-    "expected_answer": "RFC6265 obsoletes RFC2965 and moves RFC2109 and RFC2965 to Historic status. It specifies the syntax and semantics of cookies as they are actually used on the Internet, removes unused features like Cookie2 and Set-Cookie2, and provides clearer, interoperable rules for user agents and servers.",
+    "expected_answer": "RFC6265 obsoletes RFC 2965 and RFC 2109, and deprecates the Cookie2 and Set-Cookie2 headers. It specifies syntax and semantics as they are actually used on the Internet.",
     "keywords": [
-      "obsoletes RFC2965",
-      "historic RFC2109",
-      "removes Cookie2",
-      "defines real-world behavior"
+      "obsoletes RFC 2965",
+      "deprecates",
+      "Cookie2",
+      "Set-Cookie2",
+      "actually used",
+      "semantics"
     ]
   }
 ]
