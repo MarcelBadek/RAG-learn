@@ -1,4 +1,3 @@
-import logging
 import re
 
 from colorama import Fore
@@ -13,6 +12,7 @@ from CustomLogger import log
 from utils import load_files
 
 DEFAULT_MODEL = "llama3.1"
+# DEFAULT_MODEL = "deepseek-r1:8b"
 DEFAULT_EMBEDDING_MODEL = "embeddinggemma"
 # DEFAULT_EMBEDDING_MODEL = "qwen3-embedding"
 DEFAULT_BASE_URL = "localhost:11434"
@@ -83,7 +83,7 @@ class CustomRag:
 
         all_chunks = []
         for file in files:
-            log.loading("Processing file: {file.name}")
+            log.loading(f"Processing file: {file.name}")
             chunks = extractor(file)
             all_chunks.extend(chunks)
 
@@ -142,7 +142,6 @@ class CustomRag:
         log.documents("Found documents:")
         for doc in documents:
             log.documents(f"{" " * 6} - {doc.replace("\n", " ")}")
-            logging.info(f"{Fore.CYAN + " " * 6} - {doc.replace("\n", " ")}")
         log.loading(f"Preparing context for LLM")
         concatenated_documents = "\n\n".join(documents)
         log.loading(f"Generating answer with LLM")

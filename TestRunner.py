@@ -135,7 +135,7 @@ class TestRunner:
 
     def generate_statistics(self, filename=None, show_summary=True, save_summary=True):
         if filename is None:
-            filename = f"test_summary_{get_current_datetime()}"
+            filename = f"test_summary_{get_current_datetime()}.json"
         fully_correct = []
         mostly_correct = []
         partially_correct = []

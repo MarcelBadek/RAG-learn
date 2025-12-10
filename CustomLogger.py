@@ -15,6 +15,7 @@ class LoggerCategory(Enum):
     STATISTICS = "STATISTICS"
     DOCUMENTS = "DOCUMENTS"
     PROCESSING_QUESTION = "PROCESSING_QUESTION"
+    FULL_RESPONSE = "FULL_RESPONSE"
 
 
 class CustomLogger:
@@ -96,5 +97,9 @@ class CustomLogger:
     def processing_question(self, message: str):
         if LoggerCategory.PROCESSING_QUESTION in self.categories:
             print(f"{Fore.LIGHTBLUE_EX}[p] {message}{Style.RESET_ALL}")
+
+    def full_response(self, message: str):
+        if LoggerCategory.FULL_RESPONSE in self.categories:
+            print(f"{Fore.LIGHTGREEN_EX}[r] {message}{Style.RESET_ALL}")
 
 log = CustomLogger()

@@ -18,4 +18,4 @@ def save_json(data, file_path):
         json.dump(data, f, indent=4, ensure_ascii=False)
 
 def get_current_datetime():
-    return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    return datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
