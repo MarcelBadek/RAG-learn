@@ -12,6 +12,7 @@ from utils.utils import load_files
 
 DEFAULT_MODEL = "llama3.1"
 # DEFAULT_MODEL = "deepseek-r1:8b"
+# DEFAULT_MODEL = "gemma3:12b"
 DEFAULT_EMBEDDING_MODEL = "embeddinggemma"
 # DEFAULT_EMBEDDING_MODEL = "qwen3-embedding"
 DEFAULT_BASE_URL = "localhost:11434"
@@ -52,7 +53,8 @@ class CustomRag:
         self.semantic_chunker = SemanticChunker(
             embeddings=embedding_model,
             breakpoint_threshold_type="percentile",
-            breakpoint_threshold_amount=85,
+            breakpoint_threshold_amount=0.9,
+            min_chunk_size=900
         )
 
         self.adjusted_model = AdjustedOllama(DEFAULT_MODEL)
