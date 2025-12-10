@@ -215,7 +215,5 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-vectorstore/
-documents/rfc/
 volumes/
 tests/results

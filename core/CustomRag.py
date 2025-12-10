@@ -1,15 +1,14 @@
 import re
 
-from colorama import Fore
 from langchain_experimental.text_splitter import SemanticChunker
 from langchain_milvus import Milvus
 from langchain_ollama import OllamaEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pypdf import PdfReader
 
-from AdjustedOllama import AdjustedOllama
-from CustomLogger import log
-from utils import load_files
+from core.AdjustedOllama import AdjustedOllama
+from utils.CustomLogger import log
+from utils.utils import load_files
 
 DEFAULT_MODEL = "llama3.1"
 # DEFAULT_MODEL = "deepseek-r1:8b"

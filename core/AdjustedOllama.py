@@ -1,7 +1,7 @@
 from langchain_core.outputs import LLMResult
 from langchain_ollama import OllamaLLM
 
-from CustomLogger import log
+from utils.CustomLogger import log
 
 ASK_INTRO = """You are an AI assistant whose answers must rely exclusively on the context supplied. Follow these rules strictly:
 
@@ -63,7 +63,8 @@ class AdjustedOllama:
                 'total_duration_s': f"{(info.get('total_duration') / 1_000_000_000):.2f}" if info.get(
                     'total_duration') else "N/A"
             }
-            log.statistics(f"Model: {details['model']}, Prompt Tokens: {details['prompt_eval_count']}, Response Tokens: {details['eval_count']}, Duration: {details['total_duration_s']}s")
+            log.statistics(
+                f"Model: {details['model']}, Prompt Tokens: {details['prompt_eval_count']}, Response Tokens: {details['eval_count']}, Duration: {details['total_duration_s']}s")
 
         return response_text, details
 

@@ -1,11 +1,12 @@
 from colorama import init
 
-from CustomLogger import log, LoggerCategory, CustomLogger
-from CustomRag import CustomRag, DEFAULT_MODEL
-from TestRunner import TestRunner
-from utils import load_test_set
+from utils.CustomLogger import LoggerCategory, CustomLogger
+from core.CustomRag import CustomRag, DEFAULT_MODEL
+from core.TestRunner import TestRunner
+from utils.utils import load_test_set
 
 if __name__ == "__main__":
+    # CustomLogger.configure([LoggerCategory.ERROR, LoggerCategory.PROCESSING_QUESTION, LoggerCategory.FULL_PROMPT, LoggerCategory.FULL_RESPONSE])
     CustomLogger.configure([LoggerCategory.ERROR, LoggerCategory.PROCESSING_QUESTION])
     init(autoreset=True)
     rag = CustomRag()
@@ -20,4 +21,4 @@ if __name__ == "__main__":
 
     test_runner.save_tests_results(file_name)
 
-    # test_runner.multirun_tests(questions, 100)
+    # test_runner.multirun_tests(questions, 10)

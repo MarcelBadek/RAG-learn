@@ -1,12 +1,10 @@
-import datetime
 import os
 
 from colorama import Fore
 
-from AdjustedOllama import AdjustedOllama
-
-from CustomLogger import log
-from utils import save_json, get_current_datetime
+from core.AdjustedOllama import AdjustedOllama
+from utils.CustomLogger import log
+from utils.utils import save_json, get_current_datetime
 
 
 class TestRunner:
@@ -15,8 +13,8 @@ class TestRunner:
         self.adjusted_model = AdjustedOllama(model)
         self.tests_results = {}
 
-        if not os.path.exists("tests/results"):
-            os.makedirs("tests/results")
+        if not os.path.exists("../tests/results"):
+            os.makedirs("../tests/results")
 
     def run_test(self, details):
         question, expected_answer, keywords = self._separate_question(details)
@@ -63,7 +61,7 @@ class TestRunner:
             self.tests_results = {}
             for test in test_set:
                 self.run_test(test)
-            statistics.append(self.generate_statistics(save_summary=False, show_summary=False))
+            statistics.append(self.generate_summary(save_summary=False, show_summary=False))
 
         total_tests = 0
         total_correct_context = 0
@@ -89,9 +87,12 @@ class TestRunner:
             total_incorrect = total_incorrect + stat.get("incorrect_number", 0)
         log.always(f"After {run_number} runs of the test set:")
         log.always(f"Total tests: {total_tests}")
-        log.always(f"Average correct based on context: {Fore.LIGHTBLUE_EX}{total_correct_context / run_number:.2f} ({(total_correct_context / total_tests * 100):.2f}%)")
-        log.always(f"Average correct based on expected Answer: {Fore.LIGHTBLUE_EX}{total_correct_expected_answer / run_number:.2f} ({(total_correct_expected_answer / total_tests * 100):.2f}%)")
-        log.always(f"Average correct based on keywords: {Fore.LIGHTBLUE_EX}{total_correct_keywords / run_number:.2f} ({(total_correct_keywords / total_tests * 100):.2f}%)")
+        log.always(
+            f"Average correct based on context: {Fore.LIGHTBLUE_EX}{total_correct_context / run_number:.2f} ({(total_correct_context / total_tests * 100):.2f}%)")
+        log.always(
+            f"Average correct based on expected Answer: {Fore.LIGHTBLUE_EX}{total_correct_expected_answer / run_number:.2f} ({(total_correct_expected_answer / total_tests * 100):.2f}%)")
+        log.always(
+            f"Average correct based on keywords: {Fore.LIGHTBLUE_EX}{total_correct_keywords / run_number:.2f} ({(total_correct_keywords / total_tests * 100):.2f}%)")
 
         stats_summary = {
             "total_runs": run_number,
@@ -112,9 +113,6 @@ class TestRunner:
 
         save_json(stats_summary, f"tests/results/multirun_test_summary_{get_current_datetime()}.json")
 
-        return
-
-
     def save_tests_results(self, base_filename="test_results"):
         current_date_time = get_current_datetime()
         filename_details = f"{base_filename}_{current_date_time}_details.json"
@@ -131,9 +129,9 @@ class TestRunner:
         }
         save_json(simple_results, f"tests/results/{filename_simple}")
 
-        self.generate_statistics(filename_statistics)
+        self.generate_summary(filename_statistics)
 
-    def generate_statistics(self, filename=None, show_summary=True, save_summary=True):
+    def generate_summary(self, filename=None, show_summary=True, save_summary=True):
         if filename is None:
             filename = f"test_summary_{get_current_datetime()}.json"
         fully_correct = []
@@ -143,6 +141,7 @@ class TestRunner:
         response_time = 0
         token_usage = 0
         total_tests = len(self.tests_results)
+        model_name = self.tests_results.get(1)["details"].get("model", "unknown") if total_tests > 0 else "unknown"
         correct_context = sum(1 for result in self.tests_results.values() if result["is_correct_based_on_context"])
         correct_expected_answer = sum(
             1 for result in self.tests_results.values() if result["is_correct_based_on_expected_answer"])
@@ -190,7 +189,9 @@ class TestRunner:
                 f"Incorrect (correct 0/3): {Fore.LIGHTBLUE_EX}{len(incorrect)} ({self._calculate_percentage_in_total_tests(len(incorrect)):.2f}%)")
 
         statistics = {
+            "model": model_name,
             "total_tests": total_tests,
+            "total_response_time": response_time,
             "response_time_average": average_response_time,
             "total_prompt_tokens_used": token_usage,
             "average_prompt_tokens_per_test": average_token_usage,

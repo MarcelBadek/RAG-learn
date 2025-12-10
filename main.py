@@ -1,8 +1,8 @@
 import time
 from colorama import init
 
-from CustomLogger import log
-from CustomRag import CustomRag
+from utils.CustomLogger import log
+from core.CustomRag import CustomRag
 
 if __name__ == "__main__":
     init(autoreset=True)
