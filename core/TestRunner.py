@@ -111,12 +111,13 @@ class TestRunner:
             "average_incorrect": total_incorrect / run_number,
         }
 
+        self.generate_multirun_statistics_per_question(statistics)
         save_json(stats_summary, f"tests/results/multirun_test_summary_{get_current_datetime()}.json")
 
     def save_tests_results(self, base_filename="test_results"):
         current_date_time = get_current_datetime()
         filename_details = f"{base_filename}_{current_date_time}_details.json"
-        filename_simple = f"{base_filename}_{current_date_time}.json"
+        filename_simple = f"{base_filename}_{current_date_time}_qa.json"
         filename_statistics = f"{base_filename}_{current_date_time}_summary.json"
 
         save_json(self.tests_results, f"tests/results/{filename_details}")
@@ -209,12 +210,73 @@ class TestRunner:
         }
 
         if save_summary:
-            save_json(statistics, f"tests/results/{filename}.json")
+            save_json(statistics, f"tests/results/{filename}")
 
         return statistics
 
-    def _calculate_percentage_in_total_tests(self, count):
-        total_tests = len(self.tests_results)
+    def generate_multirun_statistics_per_question(self, statistics):
+        parsed_statistics = {}
+
+        all_questions = set()
+        for stat in statistics:
+            all_questions.update(stat.get("fully_correct", []))
+            all_questions.update(stat.get("mostly_correct", []))
+            all_questions.update(stat.get("partially_correct", []))
+            all_questions.update(stat.get("incorrect", []))
+
+        total_runs = len(statistics)
+
+        for question in all_questions:
+            fully_correct_count = sum(1 for stat in statistics if question in stat.get("fully_correct", []))
+            mostly_correct_count = sum(1 for stat in statistics if question in stat.get("mostly_correct", []))
+            partially_correct_count = sum(1 for stat in statistics if question in stat.get("partially_correct", []))
+            incorrect_count = sum(1 for stat in statistics if question in stat.get("incorrect", []))
+
+            success_count = fully_correct_count + mostly_correct_count
+
+            category_counts = [fully_correct_count, mostly_correct_count, partially_correct_count, incorrect_count]
+            max_category = max(category_counts)
+            stability_score = max_category / total_runs if total_runs > 0 else 0
+
+            categories = ["fully_correct", "mostly_correct", "partially_correct", "incorrect"]
+            dominant_category = categories[category_counts.index(max_category)]
+
+            parsed_statistics[question] = {
+                "total_runs": total_runs,
+                "fully_correct_count": fully_correct_count,
+                "mostly_correct_count": mostly_correct_count,
+                "partially_correct_count": partially_correct_count,
+                "incorrect_count": incorrect_count,
+                "fully_correct_percentage": self._calculate_percentage_in_total_tests(fully_correct_count, total_runs),
+                "mostly_correct_percentage": self._calculate_percentage_in_total_tests(mostly_correct_count, total_runs),
+                "partially_correct_percentage": self._calculate_percentage_in_total_tests(partially_correct_count, total_runs),
+                "incorrect_percentage": self._calculate_percentage_in_total_tests(incorrect_count, total_runs),
+                "success_rate": self._calculate_percentage_in_total_tests(success_count, total_runs),
+                "stability_score": stability_score,
+                "dominant_category": dominant_category,
+                "is_stable": stability_score >= 0.8,
+                "is_problematic": incorrect_count > (total_runs * 0.80)
+            }
+
+        # Add summary section
+        summary = {
+            "total_questions": len(all_questions),
+            "total_runs": total_runs,
+            "stable_questions": sum(1 for q in parsed_statistics.values() if q["is_stable"]),
+            "problematic_questions": sum(1 for q in parsed_statistics.values() if q["is_problematic"]),
+            "average_success_rate": sum(q["success_rate"] for q in parsed_statistics.values()) / len(parsed_statistics) if parsed_statistics else 0
+        }
+
+        output = {
+            "summary": summary,
+            "per_question_statistics": parsed_statistics
+        }
+
+        save_json(output, f"tests/results/multirun_test_summary_{get_current_datetime()}_per_question.json")
+
+    def _calculate_percentage_in_total_tests(self, count, total_tests=None):
+        if total_tests is None:
+            total_tests = len(self.tests_results)
         return (count / total_tests * 100) if total_tests > 0 else 0
 
     @staticmethod
