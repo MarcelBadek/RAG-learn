@@ -10,9 +10,10 @@ from core.AdjustedOllama import AdjustedOllama
 from utils.CustomLogger import log
 from utils.utils import load_files
 
-DEFAULT_MODEL = "llama3.1"
+# DEFAULT_MODEL = "llama3.1"
 # DEFAULT_MODEL = "deepseek-r1:8b"
 # DEFAULT_MODEL = "gemma3:12b"
+DEFAULT_MODEL = "qwen3:8b"
 DEFAULT_EMBEDDING_MODEL = "embeddinggemma"
 # DEFAULT_EMBEDDING_MODEL = "qwen3-embedding"
 DEFAULT_BASE_URL = "localhost:11434"
